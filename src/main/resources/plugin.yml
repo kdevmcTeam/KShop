@@ -1,0 +1,15 @@
+name: KShop
+version: "1"
+api-version: "1.12.2"
+main: ru.kdev.KShop.KShop
+author: kdev
+
+commands:
+  items:
+    description: Item list
+  shopadmin:
+    description: Shop Admin
+
+permissions:
+  kshop.admin:
+    default: op
