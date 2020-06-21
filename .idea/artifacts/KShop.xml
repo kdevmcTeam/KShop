@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="KShop">
-    <output-path>$PROJECT_DIR$/../Server/plugins</output-path>
-    <root id="archive" name="KShop.jar">
-      <element id="module-output" name="KShop" />
-    </root>
-  </artifact>
-</component>
