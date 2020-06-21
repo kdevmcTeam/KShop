@@ -11,8 +11,6 @@ import ru.kdev.kshop.KShop;
 import ru.kdev.kshop.database.MySQL;
 import ru.kdev.kshop.util.MessageGetter;
 
-import java.sql.SQLException;
-
 public class ShopAdminCommand implements CommandExecutor {
     private final MySQL mysql;
     private final KShop plugin;
@@ -24,8 +22,8 @@ public class ShopAdminCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        if(sender.hasPermission("kshop.admin")) {
-            if(args.length > 0) {
+        if (sender.hasPermission("kshop.admin")) {
+            if (args.length > 0) {
                 switch (args[0]) {
                     case "reload":
                         plugin.reloadConfig();
@@ -46,49 +44,33 @@ public class ShopAdminCommand implements CommandExecutor {
                             return true;
                         }
                         if (args.length == 4) {
-                            try {
-                                mysql.addItem(giving, args[2].toUpperCase(), Integer.parseInt(args[3]), 0, "");
-                                sender.sendMessage(MessageGetter.getMessage("locale.gived").replace("%player%", giving.getName()));
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                            mysql.addItem(giving, args[2].toUpperCase(), Integer.parseInt(args[3]), 0, "");
+                            sender.sendMessage(MessageGetter.getMessage("locale.gived").replace("%player%", giving.getName()));
                         } else if (args.length == 5) {
-                            try {
-                                mysql.addItem(giving, args[2].toUpperCase(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), "");
-                                sender.sendMessage(MessageGetter.getMessage("locale.gived").replace("%player%", giving.getName()));
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                            mysql.addItem(giving, args[2].toUpperCase(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), "");
+                            sender.sendMessage(MessageGetter.getMessage("locale.gived").replace("%player%", giving.getName()));
                         } else {
-                            try {
-                                StringBuilder builder = new StringBuilder();
-                                for (int i = 5; i < args.length; i++) {
-                                    builder.append(args[i]).append(" ");
-                                }
-                                String msg = builder.toString();
-                                mysql.addItem(giving, args[2].toUpperCase(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), msg);
-                                sender.sendMessage(MessageGetter.getMessage("locale.gived").replace("%player%", giving.getName()));
-                            } catch (SQLException e) {
-                                e.printStackTrace();
+                            StringBuilder builder = new StringBuilder();
+                            for (int i = 5; i < args.length; i++) {
+                                builder.append(args[i]).append(" ");
                             }
+                            String msg = builder.toString();
+                            mysql.addItem(giving, args[2].toUpperCase(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), msg);
+                            sender.sendMessage(MessageGetter.getMessage("locale.gived").replace("%player%", giving.getName()));
                         }
                         break;
                     }
                     case "clear": {
                         if (args.length == 2) {
                             Player giving = Bukkit.getPlayer(args[1]);
-                            try {
-                                mysql.removeItems(giving);
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                            mysql.removeItems(giving);
                             sender.sendMessage(MessageGetter.getMessage("locale.cleared").replace("%player%", giving.getName()));
                             break;
                         }
                     }
                 }
             } else {
-                for(String str : plugin.getConfig().getStringList("locale.admin-help")) {
+                for (String str : plugin.getConfig().getStringList("locale.admin-help")) {
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', str));
                 }
             }

@@ -1,20 +1,12 @@
 package ru.kdev.kshop.commands;
 
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import ru.kdev.kshop.KShop;
 import ru.kdev.kshop.database.MySQL;
 import ru.kdev.kshop.gui.ItemsGui;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class ItemsCommand implements CommandExecutor {
 
@@ -28,33 +20,10 @@ public class ItemsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        if(sender instanceof Player) {
+        if (sender instanceof Player) {
             Player player = (Player) sender;
-            ArrayList<ItemStack> list = new ArrayList<>();
 
-            try {
-                ResultSet resultSet = mysql.getItems(player);
-
-                if (resultSet.next()) {
-                    resultSet.previous();
-
-                    while (resultSet.next()) {
-                        ItemStack item = new ItemStack(Material.getMaterial(resultSet.getString("pattern").toUpperCase()), resultSet.getInt("quantity"), (byte) resultSet.getInt("data"));
-
-                        if(!resultSet.getString("nbt").isEmpty()) {
-                            NBTItem nbti = new NBTItem(item);
-                            nbti.mergeCompound(new NBTContainer(resultSet.getString("nbt")));
-                            list.add(nbti.getItem());
-                        } else {
-                            list.add(item);
-                        }
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            new ItemsGui(plugin, player, list);
+            mysql.getItems(player, items -> new ItemsGui(plugin, player, items));
         } else {
             sender.sendMessage("This command only for player!");
         }

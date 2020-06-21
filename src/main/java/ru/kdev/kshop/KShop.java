@@ -20,7 +20,7 @@ public class KShop extends JavaPlugin {
 
     private static final Pattern NEW_LINE = Pattern.compile("\n");
 
-    private final MySQL database = new MySQL();
+    private final MySQL database = new MySQL(this);
     private final Map<String, String> messages = new HashMap<>();
 
     @Override

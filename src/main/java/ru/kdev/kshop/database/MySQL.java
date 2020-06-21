@@ -1,21 +1,66 @@
 package ru.kdev.kshop.database;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import ru.kdev.kshop.KShop;
+import ru.kdev.kshop.item.CartItem;
+import ru.kdev.kshop.util.ThrowableConsumer;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class MySQL {
+
+    private final KShop plugin;
     private Connection connection;
 
-    private void handleCause(SQLException e) {
+    public MySQL(KShop plugin) {
+        this.plugin = plugin;
+    }
+
+    private PreparedStatement createStatement(String query, Object... objects) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(query, Statement.NO_GENERATED_KEYS);
+        ps.setQueryTimeout(5);
+
+        if (objects != null) {
+            for (int i = 0; i < objects.length; i++) {
+                Object object = objects[i];
+
+                if (object == null) {
+                    ps.setNull(i + 1, Types.VARCHAR);
+                } else {
+                    ps.setObject(i + 1, objects[i]);
+                }
+            }
+        }
+
+        if (objects == null || objects.length == 0) {
+            ps.clearParameters();
+        }
+
+        return ps;
+    }
+
+    private void handleError(SQLException e) {
         e.printStackTrace();
+    }
+
+    private void async(ThrowableConsumer<PreparedStatement, SQLException> result,
+                       String query, Object... objects) {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try (PreparedStatement ps = createStatement(query, objects)) {
+                result.accept(ps);
+            } catch (SQLException e) {
+                handleError(e);
+            }
+        });
     }
 
     public void connect(ConfigurationSection section) {
@@ -40,86 +85,77 @@ public class MySQL {
 
             connection = dataSource.getConnection();
         } catch (SQLException e) {
-            handleCause(e);
+            handleError(e);
         }
     }
 
-    public void addItem(Player player, String pattern, int quantity, int data, String nbt) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO items (nickname, pattern, quantity, data, nbt) VALUES (?, ?, ?, ?, ?)");
-        statement.setString(1, player.getName());
-        statement.setString(2, pattern);
-        statement.setInt(3, quantity);
-        statement.setInt(4, data);
-        statement.setString(5, nbt);
-        statement.executeUpdate();
+    public void executeQuery(ThrowableConsumer<ResultSet, SQLException> result, String query, Object... objects) {
+        async(ps -> {
+            try (ResultSet rs = ps.executeQuery()) {
+                result.accept(rs);
+            }
+        }, query, objects);
     }
 
-    public ResultSet getItem(Player player, int index) {
-        try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM items WHERE nickname = ?");
-            statement.setString(1, player.getName());
+    public void execute(String query, Object... objects) {
+        async(PreparedStatement::execute, query, objects);
+    }
 
-            ResultSet resultSet = statement.executeQuery();
+    public void addItem(Player player, String pattern, int quantity, int data, String nbt) {
 
-            if (!resultSet.next()) {
-                return null;
+        execute("INSERT INTO items (nickname, pattern, quantity, data, nbt) VALUES (?, ?, ?, ?, ?)",
+                player.getName(), pattern, quantity, data, nbt);
+    }
+
+    public void removeItem(CartItem item) {
+        execute("DELETE FROM items WHERE id = ?", item.getDatabaseIndex());
+    }
+
+    public void removeItems(Player player) {
+        execute("DELETE FROM items WHERE nickname = ?", player.getName());
+    }
+
+    public void getGroups(Player player, Consumer<List<String>> groupCallback) {
+        executeQuery(rs -> {
+            List<String> groups = new ArrayList<>();
+
+            while (rs.next()) {
+                groups.add(rs.getString("groupName"));
             }
 
-            resultSet.previous();
-            List<Integer> rows = new ArrayList<Integer>();
-            while (resultSet.next()) {
-                int id = resultSet.getInt(1);
-                rows.add(id);
+            groupCallback.accept(groups);
+        }, "SELECT `groupName` FROM groups WHERE nickname = ?", player.getName());
+    }
+
+    public void getItems(Player player, Consumer<List<CartItem>> itemCallback) {
+        executeQuery(rs -> {
+            List<CartItem> items = new ArrayList<>();
+
+            while (rs.next()) {
+                int index = rs.getInt("id");
+
+                ItemStack item = new ItemStack(
+                        Material.getMaterial(rs.getString("pattern").toUpperCase()),
+                        rs.getInt("quantity"), (byte) rs.getInt("data")
+                );
+
+                String nbt = rs.getString("nbt");
+
+                if (nbt != null && !nbt.isEmpty()) {
+                    NBTItem nbti = new NBTItem(item);
+                    nbti.mergeCompound(new NBTContainer(nbt));
+
+                    item = nbti.getItem();
+                }
+
+                items.add(new CartItem(index, item));
             }
-            PreparedStatement getStatement = connection.prepareStatement("SELECT * FROM items WHERE id = ?");
-            getStatement.setInt(1, rows.get(index));
-            return getStatement.executeQuery();
-        } catch (SQLException e) {
-            handleCause(e);
-            return null;
-        }
+
+            itemCallback.accept(items);
+        }, "SELECT * FROM items WHERE nickname = ?", player.getName());
     }
 
-    public void removeItem(Player player, int index) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM items WHERE nickname = ?");
-        statement.setString(1, player.getName());
-        ResultSet resultSet = statement.executeQuery();
-        if(!resultSet.next()) {
-            return;
-        }
-        resultSet.previous();
-        List<Integer> rows = new ArrayList<Integer>();
-        while (resultSet.next()) {
-            int id = resultSet.getInt(1);
-            rows.add(id);
-        }
-        PreparedStatement removeStatement = connection.prepareStatement("DELETE FROM items WHERE id = ?");
-        removeStatement.setInt(1, rows.get(index));
-        removeStatement.executeUpdate();
-    }
-
-    public void removeItems(Player player) throws SQLException {
-        PreparedStatement removeStatement = connection.prepareStatement("DELETE FROM items WHERE nickname = ?");
-        removeStatement.setString(1, player.getName());
-        removeStatement.executeUpdate();
-    }
-
-    public ResultSet getGroups(Player player) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM groups WHERE nickname = ?");
-        statement.setString(1, player.getName());
-        return statement.executeQuery();
-    }
-
-    public ResultSet getItems(Player player) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM items WHERE nickname = ?");
-        statement.setString(1, player.getName());
-        return statement.executeQuery();
-    }
-
-    public void removeGroup(Player player, String gName) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM groups WHERE nickname = ? AND groupName = ?");
-        statement.setString(1, player.getName());
-        statement.setString(2, gName);
-        statement.executeUpdate();
+    public void removeGroup(Player player, String groupName) {
+        execute("DELETE FROM groups WHERE nickname = ? AND groupName = ?", player.getName(), groupName);
     }
 }

@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.kdev.kshop.KShop;
 import ru.kdev.kshop.gui.api.Gui;
+import ru.kdev.kshop.item.CartItem;
 import ru.kdev.kshop.util.ItemBuilder;
 
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -18,10 +18,10 @@ public class ItemsGui extends Gui {
 
     private final KShop plugin;
 
-    private final List<ItemStack> items;
+    private final List<CartItem> items;
     private int page;
 
-    public ItemsGui(KShop plugin, Player player, List<ItemStack> items) {
+    public ItemsGui(KShop plugin, Player player, List<CartItem> items) {
         super(player, plugin.getMessage("menu-title"), 6);
 
         Preconditions.checkNotNull(plugin, "plugin is null");
@@ -78,22 +78,18 @@ public class ItemsGui extends Gui {
         } else {
             int i = page * 45;
 
-            Iterator<ItemStack> itr = skip(i);
+            Iterator<CartItem> itr = skip(i);
 
             for (int slot = 0; slot < 45; slot++) {
                 if (itr.hasNext()) {
-                    ItemStack item = itr.next();
-                    int index = slot + i;
+                    CartItem cartItem = itr.next();
+                    ItemStack item = cartItem.getItem();
 
                     set(slot, item, player -> {
-                        try {
-                            player.getInventory().addItem(item.clone());
-                            plugin.getDatabase().removeItem(player, index);
+                        player.getInventory().addItem(item.clone());
+                        plugin.getDatabase().removeItem(cartItem);
 
-                            player.closeInventory();
-                        } catch (SQLException e) {
-                            // fixme
-                        }
+                        player.closeInventory();
                     });
                 } else {
                     remove(slot);
@@ -109,7 +105,7 @@ public class ItemsGui extends Gui {
                 .build(), HumanEntity::closeInventory);
     }
 
-    private Iterator<ItemStack> skip(int skip) {
+    private Iterator<CartItem> skip(int skip) {
         if (skip >= items.size()) {
             return Collections.emptyIterator();
         }

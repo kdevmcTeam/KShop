@@ -7,10 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import ru.kdev.kshop.database.MySQL;
-import ru.kdev.kshop.util.MessageGetter;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class KListener implements Listener {
     private final KShop plugin;
@@ -23,18 +19,22 @@ public class KListener implements Listener {
         this.database = plugin.getDatabase();
     }
 
-    @EventHandler // todo async
-    public void onJoin(PlayerJoinEvent e) throws SQLException {
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        ResultSet resultSet = database.getGroups(player);
 
-        while (resultSet.next()) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), plugin.getConfig().getString("give-commands.give-group")
-                    .replace("%player%", player.getName())
-                    .replace("%group%", resultSet.getString("groupName")));
-            player.sendMessage(MessageGetter.getMessage("locale.success-group").replace("%group%", resultSet.getString("groupName")));
-            database.removeGroup(player, resultSet.getString("groupName"));
-        }
+        database.getGroups(player, groups -> {
+            for (String group : groups) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), plugin.getConfig().getString("give-commands.give-group")
+                        .replace("%player%", player.getName())
+                        .replace("%group%", group));
+
+                player.sendMessage(plugin.getMessage("success-group")
+                        .replace("%group%", group));
+
+                database.removeGroup(player, group);
+            }
+        });
     }
 
 }
