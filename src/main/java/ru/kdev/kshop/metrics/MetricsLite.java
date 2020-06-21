@@ -1,4 +1,4 @@
-package ru.kdev.KShop.metrics;
+package ru.kdev.kshop.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

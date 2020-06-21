@@ -1,8 +1,7 @@
-name: KShop
-version: "1"
-api-version: "1.12.2"
-main: ru.kdev.KShop.KShop
-author: kdev
+name: 'KShop'
+version: "@plugin.version@ [@plugin.revision]"
+main: 'ru.kdev.KShop.KShop'
+authors: [kdev, WhileInside]
 
 commands:
   items:
