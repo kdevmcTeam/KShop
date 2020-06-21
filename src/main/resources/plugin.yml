@@ -1,7 +1,9 @@
 name: 'KShop'
 version: "@plugin.version@ [@plugin.revision@]"
 main: 'ru.kdev.kshop.KShop'
-authors: [kdev, WhileInside]
+authors:
+  - kdev (Fiwka)
+  - WhileInside
 
 depend:
   - NBTAPI

@@ -101,18 +101,18 @@ public class MySQL {
         async(PreparedStatement::execute, query, objects);
     }
 
-    public void addItem(Player player, String pattern, int quantity, int data, String nbt) {
+    public void addItem(String playerName, String pattern, int quantity, int data, String nbt) {
 
         execute("INSERT INTO items (nickname, pattern, quantity, data, nbt) VALUES (?, ?, ?, ?, ?)",
-                player.getName(), pattern, quantity, data, nbt);
+                playerName, pattern, quantity, data, nbt);
     }
 
     public void removeItem(CartItem item) {
         execute("DELETE FROM items WHERE id = ?", item.getDatabaseIndex());
     }
 
-    public void removeItems(Player player) {
-        execute("DELETE FROM items WHERE nickname = ?", player.getName());
+    public void removeItems(String playerName) {
+        execute("DELETE FROM items WHERE nickname = ?", playerName);
     }
 
     public void getGroups(Player player, Consumer<List<String>> groupCallback) {
@@ -134,9 +134,16 @@ public class MySQL {
             while (rs.next()) {
                 int index = rs.getInt("id");
 
+                String pattern = rs.getString("pattern").toUpperCase();
+                Material material = Material.matchMaterial(pattern);
+
+                if (material == null) {
+                    plugin.getLogger().warning("Unknown material: " + pattern);
+                    continue;
+                }
+
                 ItemStack item = new ItemStack(
-                        Material.getMaterial(rs.getString("pattern").toUpperCase()),
-                        rs.getInt("quantity"), (byte) rs.getInt("data")
+                        material, rs.getInt("quantity"), (byte) rs.getInt("data")
                 );
 
                 String nbt = rs.getString("nbt");

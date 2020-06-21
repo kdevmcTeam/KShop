@@ -76,7 +76,7 @@ public class KShop extends JavaPlugin {
     }
 
     public String getMessage(String path) {
-        return messages.get(path.toLowerCase());
+        return messages.computeIfAbsent(path.toLowerCase(), x -> x);
     }
 
 }

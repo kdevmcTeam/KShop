@@ -12,11 +12,11 @@ locale:
   previous: "&aНазад"
   next: "&aВперед"
   close: "&cВыйти"
-  admin-help:
-    - "&fKShop by &ekdev (Fiwka)"
-    - "&f/shopadmin reload - перезагрузить конфиг"
-    - "&f/shopadmin add <игрок> <предмет> <количество> [data] [nbt] - добавить предмет игроку"
-    - "&f/shopadmin clear <игрок> - очистить корзину игрока"
+  admin-help: |-
+    &fKShop by &ekdev (Fiwka), WhileInside
+    &f/shopadmin reload - перезагрузить конфиг
+    &f/shopadmin add <игрок> <предмет> <количество> [data] [nbt] - добавить предмет игроку
+    &f/shopadmin clear <игрок> - очистить корзину игрока
   gived: "&aПредмет успешно добавлен в корзину игрока %player%!"
   cleared: "&aКорзина игрока %player% успешно очищена"
   next-lore: "&eПеревернуть на следующую страницу"
