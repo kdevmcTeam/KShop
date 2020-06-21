@@ -1,4 +1,4 @@
-package ru.kdev.kshop.gui;
+package ru.kdev.kshop.gui.api;
 
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;

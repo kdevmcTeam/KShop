@@ -1,4 +1,4 @@
-package ru.kdev.kshop.gui;
+package ru.kdev.kshop.gui.api;
 
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -24,7 +24,7 @@ public class Gui implements InventoryHolder {
         this.inventory = Bukkit.createInventory(this, rows * 9, title);
         this.icons = new GuiIcon[inventory.getSize()];
 
-        draw();
+        player.openInventory(inventory);
     }
 
     @Override

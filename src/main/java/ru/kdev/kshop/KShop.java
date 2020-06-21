@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.kdev.kshop.commands.ItemsCommand;
 import ru.kdev.kshop.commands.ShopAdminCommand;
 import ru.kdev.kshop.database.MySQL;
+import ru.kdev.kshop.gui.api.GuiListener;
 import ru.kdev.kshop.metrics.MetricsLite;
 
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public class KShop extends JavaPlugin {
         getCommand("shopadmin").setExecutor(new ShopAdminCommand(this));
 
         getServer().getPluginManager().registerEvents(new KListener(this), this);
+        getServer().getPluginManager().registerEvents(new GuiListener(), this);
 
         MetricsLite metrics = new MetricsLite(this, 7103);
     }

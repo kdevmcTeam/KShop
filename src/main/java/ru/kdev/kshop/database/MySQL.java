@@ -23,18 +23,18 @@ public class MySQL {
                 section.getString("host"),
                 section.getInt("port"),
                 section.getString("database"),
-                section.getString("username"),
+                section.getString("user"),
                 section.getString("password")
         );
     }
 
-    public void connect(String host, int port, String database, String username, String password) {
+    public void connect(String host, int port, String database, String user, String password) {
         try {
             MysqlDataSource dataSource = new MysqlDataSource();
             dataSource.setServerName(host);
             dataSource.setPort(port);
             dataSource.setDatabaseName(database);
-            dataSource.setUser(username);
+            dataSource.setUser(user);
             dataSource.setPassword(password);
             dataSource.setServerTimezone("UTC");
 

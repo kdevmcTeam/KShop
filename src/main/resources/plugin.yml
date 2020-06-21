@@ -1,7 +1,10 @@
 name: 'KShop'
-version: "@plugin.version@ [@plugin.revision]"
-main: 'ru.kdev.KShop.KShop'
+version: "@plugin.version@ [@plugin.revision@]"
+main: 'ru.kdev.kshop.KShop'
 authors: [kdev, WhileInside]
+
+depend:
+  - NBTAPI
 
 commands:
   items:

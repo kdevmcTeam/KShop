@@ -1,27 +1,36 @@
 package ru.kdev.kshop.gui;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.kdev.kshop.KShop;
+import ru.kdev.kshop.gui.api.Gui;
 import ru.kdev.kshop.util.ItemBuilder;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
-public class PageGUI extends Gui {
+public class ItemsGui extends Gui {
 
     private final KShop plugin;
 
     private final List<ItemStack> items;
     private int page;
 
-    public PageGUI(KShop plugin, Player player, List<ItemStack> items) {
+    public ItemsGui(KShop plugin, Player player, List<ItemStack> items) {
         super(player, plugin.getMessage("menu-title"), 6);
+
+        Preconditions.checkNotNull(plugin, "plugin is null");
+        Preconditions.checkNotNull(items, "items is null");
 
         this.plugin = plugin;
         this.items = items;
+
+        draw();
     }
 
     public void nextPage() {
@@ -34,10 +43,6 @@ public class PageGUI extends Gui {
         page--;
 
         draw();
-    }
-
-    public List<ItemStack> getItems() {
-        return items;
     }
 
     public void drawScrollingButtons() {
@@ -66,32 +71,50 @@ public class PageGUI extends Gui {
 
     @Override
     public void draw() {
-        int i = page * 45;
+        if (items.isEmpty()) {
+            set(22, ItemBuilder.getBuilder(Material.BUCKET)
+                    .setName(plugin.getMessage("no-items"))
+                    .build());
+        } else {
+            int i = page * 45;
 
-        for (int x = 0; x < 45 && x < items.size(); x++) {
-            if (i + x + 1 > items.size()) break;
+            Iterator<ItemStack> itr = skip(i);
 
-            int slot = i + x;
-            ItemStack item = items.get(slot);
+            for (int slot = 0; slot < 45; slot++) {
+                if (itr.hasNext()) {
+                    ItemStack item = itr.next();
+                    int index = slot + i;
 
-            set(x, item, player -> {
-                try {
-                    player.getInventory().addItem(item.clone());
-                    plugin.getDatabase().removeItem(player, slot);
+                    set(slot, item, player -> {
+                        try {
+                            player.getInventory().addItem(item.clone());
+                            plugin.getDatabase().removeItem(player, index);
 
-                    player.closeInventory();
-                } catch (SQLException e) {
-                    // fixme
+                            player.closeInventory();
+                        } catch (SQLException e) {
+                            // fixme
+                        }
+                    });
+                } else {
+                    remove(slot);
                 }
-            });
-        }
+            }
 
-        drawScrollingButtons();
+            drawScrollingButtons();
+        }
 
         set(49, ItemBuilder.getBuilder(Material.ARROW)
                 .setName(plugin.getMessage("close"))
                 .setLore(plugin.getMessageList("close-lore"))
                 .build(), HumanEntity::closeInventory);
+    }
+
+    private Iterator<ItemStack> skip(int skip) {
+        if (skip >= items.size()) {
+            return Collections.emptyIterator();
+        }
+
+        return items.subList(skip, items.size()).iterator();
     }
 
 }

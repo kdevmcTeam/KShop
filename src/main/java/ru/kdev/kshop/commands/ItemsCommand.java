@@ -10,8 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.kdev.kshop.KShop;
 import ru.kdev.kshop.database.MySQL;
-import ru.kdev.kshop.gui.EmptyGui;
-import ru.kdev.kshop.gui.PageGUI;
+import ru.kdev.kshop.gui.ItemsGui;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,16 +30,16 @@ public class ItemsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if(sender instanceof Player) {
             Player player = (Player) sender;
+            ArrayList<ItemStack> list = new ArrayList<>();
+
             try {
                 ResultSet resultSet = mysql.getItems(player);
 
-                if(resultSet.next()) {
+                if (resultSet.next()) {
                     resultSet.previous();
 
-                    ArrayList<ItemStack> list = new ArrayList<>();
-
                     while (resultSet.next()) {
-                        ItemStack item = new ItemStack(Material.getMaterial(resultSet.getString("pattern").toUpperCase()), resultSet.getInt("quantity"), (byte)resultSet.getInt("data"));
+                        ItemStack item = new ItemStack(Material.getMaterial(resultSet.getString("pattern").toUpperCase()), resultSet.getInt("quantity"), (byte) resultSet.getInt("data"));
 
                         if(!resultSet.getString("nbt").isEmpty()) {
                             NBTItem nbti = new NBTItem(item);
@@ -50,14 +49,12 @@ public class ItemsCommand implements CommandExecutor {
                             list.add(item);
                         }
                     }
-
-                    new PageGUI(plugin, player, list);
-                } else {
-                    player.openInventory(EmptyGui.getEmptyInventory(player));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+
+            new ItemsGui(plugin, player, list);
         } else {
             sender.sendMessage("This command only for player!");
         }
