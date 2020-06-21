@@ -64,7 +64,7 @@ public class KShop extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new KListener(this), this);
         getServer().getPluginManager().registerEvents(new GuiListener(), this);
 
-        MetricsLite metrics = new MetricsLite(this, 7103);
+        new MetricsLite(this, 7103);
     }
 
     public MySQL getDatabase() {
