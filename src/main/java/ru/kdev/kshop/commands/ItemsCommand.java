@@ -24,9 +24,8 @@ public class ItemsCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             mysql.getItems(player, items -> new ItemsGui(plugin, player, items));
-        } else {
-            sender.sendMessage("This command only for player!");
         }
-        return false;
+
+        return true;
     }
 }

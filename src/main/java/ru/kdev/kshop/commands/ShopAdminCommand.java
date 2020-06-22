@@ -6,13 +6,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import ru.kdev.kshop.KShop;
 import ru.kdev.kshop.database.MySQL;
+import ru.kdev.kshop.util.Patterns;
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 public class ShopAdminCommand implements CommandExecutor {
-
-    private static final Pattern DIGIT_PATTERN = Pattern.compile("^\\d+$");
 
     private final MySQL mysql;
     private final KShop plugin;
@@ -32,6 +30,16 @@ public class ShopAdminCommand implements CommandExecutor {
         String subcommand = args.length == 0 ? "help" : args[0];
 
         switch (subcommand) {
+            case "check-updates": {
+                String branch = plugin.getUpdateBranch();
+
+                if (args.length > 1) {
+                    branch = args[1];
+                }
+
+                plugin.getUpdateChecker().checkUpdates(sender, branch);
+                break;
+            }
             case "reload": {
                 plugin.reloadConfig();
 
@@ -54,7 +62,7 @@ public class ShopAdminCommand implements CommandExecutor {
 
                 String amountString = args[3];
 
-                if (!DIGIT_PATTERN.matcher(amountString).matches()) {
+                if (!Patterns.DIGIT.matcher(amountString).matches()) {
                     sender.sendMessage(plugin.getMessage("wrong-quantity"));
                     break;
                 }
@@ -72,7 +80,7 @@ public class ShopAdminCommand implements CommandExecutor {
                 if (args.length >= 5) {
                     String dataString = args[4];
 
-                    if (!DIGIT_PATTERN.matcher(dataString).matches()) {
+                    if (!Patterns.DIGIT.matcher(dataString).matches()) {
                         sender.sendMessage(plugin.getMessage("wrong-data"));
                         break;
                     }

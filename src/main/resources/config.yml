@@ -4,27 +4,61 @@ connection:
   password: root
   database: shop
   port: 3306
+
+update-checker:
+  enabled: true
+  branch: master
+
 give-commands:
-  give-group: "pex user %player% group set %group%"
+  give-group: 'pex user %player% group set %group%'
+
+menu:
+  no-items-icon:
+    location: 4, 2
+    id: BUCKET
+    name: '&cКорзина пуста'
+    lore: '&7Вы можете приобрести товар на нашем сайте: http://localhost'
+
+  previous-button:
+    location: 0, 5
+    id: SPECTRAL_ARROW
+    name: '&aНазад'
+    lore: '&7Вернуться на страницу %prev_page%/%total_pages%'
+
+  next-button:
+    location: 8, 5
+    id: SPECTRAL_ARROW
+    name: '&aВперед'
+    lore: '&7Перейти на страницу %next_page%/%total_pages%'
+
+  close-button:
+    location: 4, 5
+    id: ARROW
+    name: '&cВыйти'
+    lore: '&7Нажмите, чтобы закрыть меню'
+
+  rows: 6
+  title: '&aПредметы'
+
+  item-container:
+    x: 0
+    y: 0
+    w: 9
+    h: 5
+
 locale:
-  no-permission: "&cДля этого действия необходим статус &5Админ"
-  no-items: "&cКорзина пуста"
-  previous: "&aНазад"
-  next: "&aВперед"
-  close: "&cВыйти"
+  no-permission: '&cДля этого действия необходим статус &5Админ'
+  no-args: '&cНедостаточно аргументов.'
+  wrong-material: '&cНеверный материал.'
+  wrong-quantity: '&cНеверное количество.'
+
   admin-help: |-
     &fKShop by &ekdev (Fiwka), WhileInside
     &f/shopadmin reload - перезагрузить конфиг
     &f/shopadmin add <игрок> <предмет> <количество> [data] [nbt] - добавить предмет игроку
     &f/shopadmin clear <игрок> - очистить корзину игрока
-  gived: "&aПредмет успешно добавлен в корзину игрока %player%!"
-  cleared: "&aКорзина игрока %player% успешно очищена"
-  next-lore: "&eПеревернуть на следующую страницу"
-  previous-lore: "&eПеревернуть назад"
-  success-group: "&aВы успешно получили привилегию \"%group%\"!"
-  close-lore: "&7Закрыть меню"
-  menu-title: "&aПредметы"
-  no-args: "&cНедостаточно аргументов."
-  wrong-material: "&cНеверный материал."
-  wrong-quantity: "&cНеверное количество."
-  reload: "&aКонфигурация перезагружена."
+
+  gived: '&aПредмет успешно добавлен в корзину игрока %player%!'
+  cleared: '&aКорзина игрока %player% успешно очищена'
+  success-group: '&aВы успешно получили привилегию "%group%"!'
+  reload: '&aКонфигурация перезагружена.'
