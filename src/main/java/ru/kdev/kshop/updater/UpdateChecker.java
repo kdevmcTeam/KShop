@@ -87,24 +87,17 @@ public class UpdateChecker {
                 for (String commitMessage : commitMessages) {
                     Matcher matcher = Patterns.COMMIT_MESSAGE.matcher(commitMessage);
 
-                    UpdateType type;
-                    String message;
-
-                    if (matcher.matches()) {
-                        type = UpdateType.getByName(matcher.group(1));
-                        message = matcher.group(2);
-                    } else {
-                        type = UpdateType.UNKNOWN;
-                        message = commitMessage;
-                    }
+                    UpdateType type = matcher.matches()
+                            ? UpdateType.getByName(matcher.group(1))
+                            : UpdateType.UNKNOWN;
 
                     if (!isHeaderSent) {
                         printMessage(sender, "§eFound updates: ");
                         isHeaderSent = true;
                     }
 
-                    printMessage(sender, String.format(" %s- %s §r(Author: %s)",
-                            type.getColor(), message, commit.getAuthorName()));
+                    printMessage(sender, String.format(" - %s%s §r(Author: %s)",
+                            type.getColor(), commitMessage, commit.getAuthorName()));
                 }
             }
 
