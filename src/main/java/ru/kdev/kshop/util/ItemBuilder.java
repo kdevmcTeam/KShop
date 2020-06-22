@@ -18,7 +18,7 @@ public class ItemBuilder {
         this.meta = item.getItemMeta();
     }
 
-    public static ItemBuilder parseItem(ConfigurationSection section) {
+    public static ItemBuilder parseItem(ConfigurationSection section, Object... replacements) {
         String id = section.getString("id");
 
         if (id == null) {
@@ -47,7 +47,7 @@ public class ItemBuilder {
             builder.setLore(lore);
         }
 
-        return builder.applyReplacements(true);
+        return builder.applyReplacements(true, replacements);
     }
 
     public static ItemBuilder getBuilder(Material material) {

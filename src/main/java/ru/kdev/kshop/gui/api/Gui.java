@@ -101,23 +101,23 @@ public class Gui implements InventoryHolder {
         icon.handleClick(player);
     }
 
-    public GuiDynamicIcon set(ConfigurationSection section) {
-        return set(section, null);
+    public void set(ConfigurationSection section) {
+        set(section, null);
     }
 
-    public GuiDynamicIcon set(ConfigurationSection section, Consumer<Player> onClickHandler) {
+    public int set(ConfigurationSection section, Consumer<Player> onClickHandler, Object... replacements) {
         String location = section.getString("location");
 
         if (location == null) {
             throw new IllegalStateException("Location is required");
         }
 
-        ItemBuilder builder = ItemBuilder.parseItem(section);
         int slot = SlotUtil.parseSlot(location);
 
+        ItemBuilder builder = ItemBuilder.parseItem(section, replacements);
         set(slot, builder.build(), onClickHandler);
 
-        return new GuiDynamicIcon(slot, builder);
+        return slot;
     }
 
 }

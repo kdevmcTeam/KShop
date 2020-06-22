@@ -17,25 +17,29 @@ menu:
     location: 4, 2
     id: BUCKET
     name: '&cКорзина пуста'
-    lore: '&7Вы можете приобрести товар на нашем сайте: http://localhost'
+    lore:
+      - '&7Вы можете приобрести товар на нашем сайте: http://localhost'
 
   previous-button:
     location: 0, 5
     id: SPECTRAL_ARROW
     name: '&aНазад'
-    lore: '&7Вернуться на страницу %prev_page%/%total_pages%'
+    lore:
+      - '&7Вернуться на страницу %prev_page%/%total_pages%'
 
   next-button:
     location: 8, 5
     id: SPECTRAL_ARROW
     name: '&aВперед'
-    lore: '&7Перейти на страницу %next_page%/%total_pages%'
+    lore:
+      - '&7Перейти на страницу %next_page%/%total_pages%'
 
   close-button:
     location: 4, 5
     id: ARROW
     name: '&cВыйти'
-    lore: '&7Нажмите, чтобы закрыть меню'
+    lore:
+      - '&7Нажмите, чтобы закрыть меню'
 
   rows: 6
   title: '&aПредметы'

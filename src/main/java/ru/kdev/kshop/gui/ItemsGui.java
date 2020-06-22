@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.kdev.kshop.KShop;
 import ru.kdev.kshop.gui.api.Gui;
-import ru.kdev.kshop.gui.api.GuiDynamicIcon;
 import ru.kdev.kshop.item.CartItem;
 
 import java.util.Collections;
@@ -22,8 +21,8 @@ public class ItemsGui extends Gui {
     private final List<CartItem> items;
     private final int[] itemSlots;
 
+    private final int pages;
     private int page;
-    private int pages;
 
     public ItemsGui(KShop plugin, Player player, List<CartItem> items) {
         super(player, plugin.getMessage("menu.title"), plugin.getConfig().getInt("menu.rows"));
@@ -62,41 +61,35 @@ public class ItemsGui extends Gui {
 
     public void nextPage() {
         page++;
-
         draw();
     }
 
     public void previousPage() {
         page--;
-
         draw();
     }
 
-    private GuiDynamicIcon prevPage;
-    private GuiDynamicIcon nextPage;
+    private int prevPageSlot = -1;
+    private int nextPageSlot = -1;
 
     public void drawScrollingButtons() {
         Object[] replacements = new Object[]{
-                "%total_pages%", pages, "%next_page%", page + 1, "%prev_page%", page - 1
+                "%total_pages%", pages, "%page%", page + 1, "%next_page%", page + 2, "%prev_page%", page
         };
 
         if (page > 0) {
-            prevPage = set(getNotNullSection("previous-button"), player -> previousPage());
-            prevPage.getBuilder().applyReplacements(false, replacements);
-            prevPage.getBuilder().update();
+            prevPageSlot = set(getNotNullSection("previous-button"), player -> previousPage(), replacements);
         } else {
-            if (prevPage != null) {
-                remove(prevPage.getSlot());
+            if (prevPageSlot != -1) {
+                remove(prevPageSlot);
             }
         }
 
         if (page != pages - 1) {
-            nextPage = set(getNotNullSection("next-button"), player -> nextPage());
-            nextPage.getBuilder().applyReplacements(false, replacements);
-            nextPage.getBuilder().update();
+            nextPageSlot = set(getNotNullSection("next-button"), player -> nextPage(), replacements);
         } else {
-            if (nextPage != null) {
-                remove(nextPage.getSlot());
+            if (nextPageSlot != -1) {
+                remove(nextPageSlot);
             }
         }
     }
