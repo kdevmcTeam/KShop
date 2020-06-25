@@ -75,6 +75,10 @@ public class MySQL {
 
     public void connect(String host, int port, String database, String user, String password) {
         try {
+            if (connection != null) {
+                connection.close();
+            }
+
             MysqlDataSource dataSource = new MysqlDataSource();
             dataSource.setServerName(host);
             dataSource.setPort(port);

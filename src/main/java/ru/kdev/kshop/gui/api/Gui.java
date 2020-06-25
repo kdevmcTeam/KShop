@@ -2,10 +2,13 @@ package ru.kdev.kshop.gui.api;
 
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import ru.kdev.kshop.util.ItemBuilder;
+import ru.kdev.kshop.util.SlotUtil;
 
 import java.util.function.Consumer;
 
@@ -96,6 +99,25 @@ public class Gui implements InventoryHolder {
         }
 
         icon.handleClick(player);
+    }
+
+    public void set(ConfigurationSection section) {
+        set(section, null);
+    }
+
+    public int set(ConfigurationSection section, Consumer<Player> onClickHandler, Object... replacements) {
+        String location = section.getString("location");
+
+        if (location == null) {
+            throw new IllegalStateException("Location is required");
+        }
+
+        int slot = SlotUtil.parseSlot(location);
+
+        ItemBuilder builder = ItemBuilder.parseItem(section, replacements);
+        set(slot, builder.build(), onClickHandler);
+
+        return slot;
     }
 
 }

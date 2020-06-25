@@ -6,16 +6,14 @@ plugins {
     id("java-library")
 }
 
-delete(files("${rootDir}/output"))
-
 group = "ru.kdev"
-version = "1.1.0-SNAPSHOT"
+version = "1.2.0-SNAPSHOT"
 
 fun getGitHash(): String {
     val output = ByteArrayOutputStream()
 
     exec {
-        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
+        commandLine = listOf("git", "rev-parse", "--short=8", "HEAD")
         standardOutput = output
     }
 
@@ -44,12 +42,15 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
-    compileOnly("org.bukkit:bukkit:1.15.2-R0.1-SNAPSHOT")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
     compileOnly("mysql:mysql-connector-java:5.1.49")
 }
 
 tasks {
+    clean {
+        delete(files("${rootDir}/output"))
+    }
+
     processResources {
         filter<ReplaceTokens>("tokens" to
                 mapOf(
